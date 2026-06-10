@@ -1,5 +1,6 @@
 package org.mathffreitas.resource;
 
+import io.micrometer.core.annotation.Counted;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -12,6 +13,7 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 public class PersonResource {
     @GET
+    @Counted(value = "counted.getPerson")
     public List<Person> getPerson() {
         return Person.listAll();
     }

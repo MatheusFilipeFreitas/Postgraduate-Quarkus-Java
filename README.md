@@ -4,6 +4,71 @@ This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
 
+## Topics covered in this project
+
+This repository is a postgraduate Quarkus lab project. It introduces the following concepts and extensions:
+
+### REST APIs (Jakarta REST)
+
+Basic REST endpoints with different media types and HTTP verbs.
+
+| Resource | Path | Description |
+| --- | --- | --- |
+| `GreetingResource` | `/hello` | Simple text response |
+| `UnipdsResource` | `/unipds` | Stateful counter with GET, POST, PUT, DELETE |
+| `PersonResource` | `/person` | CRUD and query by birth year |
+| `StarWarsResource` | `/starwars/starships` | Proxy to an external REST API |
+| `SecureResource` | `/secure/claim` | JWT-protected endpoint |
+
+### OpenAPI / Swagger UI
+
+API documentation is generated automatically. In dev mode, access Swagger UI at <http://localhost:8080/q/swagger-ui>.
+
+### REST Client
+
+`StarWarService` uses the MicroProfile REST Client to call the [SWAPI](https://swapi.info/api/) starships endpoint.
+
+### Fault tolerance
+
+Applied on the REST client call in `StarWarService`:
+
+- **Timeout** — fails the request after 3 seconds
+- **Circuit breaker** — opens when failures exceed the configured ratio and volume
+- **Fallback** — returns a default message when the external API is unavailable
+
+Endpoint: `GET /starwars/starships`
+
+### Health checks
+
+Custom liveness and readiness probes using SmallRye Health:
+
+- **Liveness** (`LivenessCheck`) — reports the application is running
+- **Readiness** (`ReadinessCheck`) — checks whether the Star Wars API is reachable (down when fallback is used)
+
+Endpoints: `/q/health/live` and `/q/health/ready`
+
+### Persistence (Hibernate ORM + Panache)
+
+`Person` is a Panache entity backed by PostgreSQL, with seed data in `import.sql`. `PersonResource` exposes full CRUD and a custom query by birth year.
+
+### Security (JWT + RBAC)
+
+JWT validation is configured in `application.properties`. `SecureResource` reads the `preferred_username` claim and restricts access with `@RolesAllowed("Subscriber")`.
+
+### Observability
+
+The project covers metrics, tracing, and JDBC instrumentation:
+
+- **Micrometer + Prometheus** — custom metrics with `@Counted` on `GET /person` (exposed at `/q/metrics`)
+- **OpenTelemetry** — distributed tracing integrated with Jaeger
+- **JDBC telemetry** — database calls traced via `quarkus.datasource.jdbc.telemetry=true`
+
+Run Jaeger locally (see [Jaeger section](#jaeger-distributed-tracing)) and inspect traces at <http://localhost:16686>.
+
+### Testing
+
+Unit and integration tests with JUnit and REST Assured (`GreetingResourceTest`, `GreetingResourceIT`).
+
 ## Running the application in dev mode
 
 You can run your application in dev mode that enables live coding using:
@@ -86,13 +151,12 @@ If you want to learn more about building native executables, please consult <htt
 
 ## Related Guides
 
-- REST ([guide](https://quarkus.io/guides/rest)): Build RESTful web services and APIs using Jakarta REST (formerly JAX-RS)
-- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Generate OpenAPI schemas and serve Swagger UI for REST API documentation
-
-## Provided Code
-
-### REST
-
-Easily start your REST Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
+- REST ([guide](https://quarkus.io/guides/rest))
+- REST Client ([guide](https://quarkus.io/guides/rest-client))
+- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui))
+- SmallRye Fault Tolerance ([guide](https://quarkus.io/guides/smallrye-fault-tolerance))
+- SmallRye Health ([guide](https://quarkus.io/guides/smallrye-health))
+- Hibernate ORM with Panache ([guide](https://quarkus.io/guides/hibernate-orm-panache))
+- Security with JWT ([guide](https://quarkus.io/guides/security-jwt))
+- Micrometer metrics ([guide](https://quarkus.io/guides/micrometer))
+- OpenTelemetry tracing ([guide](https://quarkus.io/guides/opentelemetry))
