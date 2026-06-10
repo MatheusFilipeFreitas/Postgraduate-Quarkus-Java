@@ -14,6 +14,37 @@ You can run your application in dev mode that enables live coding using:
 
 > **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
 
+## Quarkus CLI and useful commands
+
+If you have the [Quarkus CLI](https://quarkus.io/guides/cli-tooling) installed, these are the most common commands for day-to-day work:
+
+| Command | Description |
+| --- | --- |
+| `quarkus dev` | Run the application in dev mode with live reload |
+| `quarkus build` | Build the application (JAR or native, depending on configuration) |
+| `quarkus create` | Create a new Quarkus project |
+| `quarkus ext add <name>` | Add an extension to the project (e.g. `quarkus ext add rest-client`) |
+| `quarkus ext list` | List available extensions |
+| `quarkus info` | Show project and platform information |
+
+This project also supports the same workflows through Maven:
+
+```shell script
+./mvnw quarkus:dev
+./mvnw package
+./mvnw quarkus:add-extension -Dextensions="rest-client"
+```
+
+### Jaeger (distributed tracing)
+
+To run Jaeger locally for tracing and observability:
+
+```shell script
+docker run --name=jaeger -d -p 16686:16686 -p 4317:4317 -e COLLECTOR_OTLP_ENABLED=true jaegertracing/all-in-one:latest
+```
+
+After the container starts, open the Jaeger UI at <http://localhost:16686>.
+
 ## Packaging and running the application
 
 The application can be packaged using:
